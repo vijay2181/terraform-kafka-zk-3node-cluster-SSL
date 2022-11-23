@@ -198,8 +198,11 @@ PASS="password"
 CA_CERT="/certs/ca.crt"
 CA_KEY="/certs/ca.key"
 
-sudo cat > /certs/certs.sh << EOF
-for i in $KAFKA3 client
+
+elements="$KAFKA3","client"
+
+IFS=',' read -r -a array <<< "$elements"
+for i in "$${array[@]}"
 do
         if [[ ! -f $CERTS_PATH/$i.keystore.jks ]] && [[ ! -f $CERTS_PATH/$i.truststore.jks ]];then
         printf "Creating cert and keystore for $KAFKA..."
@@ -212,24 +215,14 @@ do
                              -storepass $PASS \
                              -keypass $PASS  >/dev/null 2>&1
 
-
-
         # Create CSR, sign the key and import back into keystore
         keytool -keystore $CERTS_PATH/$i.keystore.jks -alias $i -certreq -file /tmp/$i.csr -storepass $PASS -keypass $PASS >/dev/null 2>&1
 
-
-
         openssl x509 -req -CA $CA_CERT -CAkey $CA_KEY -in /tmp/$i.csr -out /tmp/$i-ca-signed.crt -days 1825 -CAcreateserial -passin pass:$PASS  >/dev/null 2>&1
-
-
 
         keytool -keystore $CERTS_PATH/$i.keystore.jks -alias CARoot -import -noprompt -file $CA_CERT -storepass $PASS -keypass $PASS >/dev/null 2>&1
 
-
-
         keytool -keystore $CERTS_PATH/$i.keystore.jks -alias $i -import -file /tmp/$i-ca-signed.crt -storepass $PASS -keypass $PASS >/dev/null 2>&1
-
-
 
         # Create truststore and import the CA cert.
         keytool -keystore $CERTS_PATH/$i.truststore.jks -alias CARoot -import -noprompt -file $CA_CERT -storepass $PASS -keypass $PASS >/dev/null 2>&1
@@ -239,12 +232,8 @@ do
            echo " OK!"
     fi
 done
-EOF
 
 chown -R kafka:kafka /certs/
-sudo bash certs.sh
-
-
 ##################################################### clients properties ###############################################
 sudo cat > /certs/client.properties << EOF
 bootstrap.servers=kafka1.vijay4devops.co:9092,kafka2.vijay4devops.co:9092,kafka3.vijay4devops.co:9092
@@ -256,6 +245,7 @@ ssl.keystore.password=password
 ssl.key.password=password
 EOF
 
+chown -R kafka:kafka /certs/
 #####################################################################################################################
 
 sudo systemctl start zookeeper
