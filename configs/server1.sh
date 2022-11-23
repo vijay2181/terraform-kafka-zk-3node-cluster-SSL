@@ -79,9 +79,7 @@ server.3=$ZK3:2888:3888
 EOF
 
 
-
-
-############# KAFKA PUBLIC CONFIGURATION ##############
+############# KAFKA PRIVATE CONFIGURATION ##############
 
 KAFKA_VERSION=3.2.0
 
@@ -198,10 +196,11 @@ CERTS_PATH="/certs"
 PASS="password"
 CA_CERT="/certs/ca.crt"
 CA_KEY="/certs/ca.key"
-KAFKA="kafka1"
 
-sudo cat > /certs/certs.sh << EOF
-for i in $KAFKA1 client
+elements="$KAFKA1","client"
+
+IFS=',' read -r -a array <<< "$elements"
+for i in "$${array[@]}"
 do
         if [[ ! -f $CERTS_PATH/$i.keystore.jks ]] && [[ ! -f $CERTS_PATH/$i.truststore.jks ]];then
         printf "Creating cert and keystore for $KAFKA..."
@@ -214,24 +213,14 @@ do
                              -storepass $PASS \
                              -keypass $PASS  >/dev/null 2>&1
 
-
-
         # Create CSR, sign the key and import back into keystore
         keytool -keystore $CERTS_PATH/$i.keystore.jks -alias $i -certreq -file /tmp/$i.csr -storepass $PASS -keypass $PASS >/dev/null 2>&1
 
-
-
         openssl x509 -req -CA $CA_CERT -CAkey $CA_KEY -in /tmp/$i.csr -out /tmp/$i-ca-signed.crt -days 1825 -CAcreateserial -passin pass:$PASS  >/dev/null 2>&1
-
-
 
         keytool -keystore $CERTS_PATH/$i.keystore.jks -alias CARoot -import -noprompt -file $CA_CERT -storepass $PASS -keypass $PASS >/dev/null 2>&1
 
-
-
         keytool -keystore $CERTS_PATH/$i.keystore.jks -alias $i -import -file /tmp/$i-ca-signed.crt -storepass $PASS -keypass $PASS >/dev/null 2>&1
-
-
 
         # Create truststore and import the CA cert.
         keytool -keystore $CERTS_PATH/$i.truststore.jks -alias CARoot -import -noprompt -file $CA_CERT -storepass $PASS -keypass $PASS >/dev/null 2>&1
@@ -241,10 +230,8 @@ do
            echo " OK!"
     fi
 done
-EOF
 
 chown -R kafka:kafka /certs/
-sudo bash certs.sh
 
 ##################################################### clients properties ###############################################
 sudo cat > /certs/client.properties << EOF
