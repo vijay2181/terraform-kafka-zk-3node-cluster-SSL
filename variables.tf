@@ -4,7 +4,7 @@
 variable "ami_id" {
   description = "Default ami id for ubuntu"
   type        = string
-  default     = "ami-017fecd1353bcc96e"
+  default     = "ami-017fecd1353bcc96e"  #give ubuntu ami according to region
 }
 
 #region
@@ -25,7 +25,7 @@ variable "instance_type" {
 variable "key_name" {
   description = "ec2 keypair name"
   type        = string
-  default     = "ninaquad" #give keypair name in aws
+  default     = "keypair_name" #give keypair name in aws
 }
 
 
@@ -56,5 +56,5 @@ variable "hostnames" {
 }
 
 variable "public_hosted_zone_id" {
-  default = "Z09439721D2SDAGESDO3Q"
+  default = "public_hosted_zone_id_name"  #give hosted zone name
 }

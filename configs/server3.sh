@@ -3,6 +3,8 @@
 ZK1="zk1.vijay4devops.co"
 ZK2="zk2.vijay4devops.co"
 ZK3="zk3.vijay4devops.co"
+KAFKA1="kafka1.vijay4devops.co"
+KAFKA2="kafka2.vijay4devops.co"
 KAFKA3="kafka3.vijay4devops.co"
 REGION="us-west-2"
 
@@ -165,7 +167,7 @@ ssl.keystore.location=/certs/$KAFKA3.keystore.jks
 ssl.truststore.location=/certs/$KAFKA3.truststore.jks
 authorizer.class.name=kafka.security.authorizer.AclAuthorizer
 allow.everyone.if.no.acl.found=false
-super.users=User:CN=kafka1.vijay4devops.co,OU=Devops,O=Vijay Pvt Ltd,L=Hyderabad,C=IN;User:CN=kafka2.vijay4devops.co,OU=Devops,O=Vijay Pvt Ltd,L=Hyderabad,C=IN;User:CN=kafka3.vijay4devops.co,OU=Devops,O=Vijay Pvt Ltd,L=Hyderabad,C=IN;User:CN=client,OU=Devops,O=Vijay Pvt Ltd,L=Hyderabad,C=IN
+super.users=User:CN=$KAFKA1,OU=Devops,O=Vijay Pvt Ltd,L=Hyderabad,C=IN;User:CN=$KAFKA2,OU=Devops,O=Vijay Pvt Ltd,L=Hyderabad,C=IN;User:CN=$KAFKA3,OU=Devops,O=Vijay Pvt Ltd,L=Hyderabad,C=IN;User:CN=client,OU=Devops,O=Vijay Pvt Ltd,L=Hyderabad,C=IN
 EOF
 
 ######################################################### URLS #######################################################
@@ -236,7 +238,7 @@ done
 chown -R kafka:kafka /certs/
 ##################################################### clients properties ###############################################
 sudo cat > /certs/client.properties << EOF
-bootstrap.servers=kafka1.vijay4devops.co:9092,kafka2.vijay4devops.co:9092,kafka3.vijay4devops.co:9092
+bootstrap.servers=$KAFKA1:9092,$KAFKA2:9092,$KAFKA3:9092
 security.protocol=SSL
 ssl.truststore.location=/certs/client.truststore.jks
 ssl.truststore.password=password

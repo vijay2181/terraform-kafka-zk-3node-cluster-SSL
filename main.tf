@@ -127,17 +127,6 @@ resource "null_resource" "local_provisioners2" {
   }
 }
 
-# resource "null_resource" "local_provisioners3" {
-#   count = "${var.instance_count}"
-#   depends_on = [
-#    aws_ssm_parameter.public_ips
-#  ]
-#   provisioner "local-exec" {
-#     command = "echo ${element(aws_instance.VIJAY-TERRAFORM.*.public_ip, count.index)} >> hosts.public"
-#   }
-# }
-
-
 resource "null_resource" "ca_certs" {
 
  provisioner "local-exec" {
